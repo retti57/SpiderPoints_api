@@ -1,4 +1,5 @@
 import datetime
+import time
 from pathlib import Path
 from pydantic import BaseModel
 import uvicorn
@@ -15,20 +16,27 @@ class GridData(BaseModel):
     distance: str
 
 
-@app.get("/kml/points/")
+@app.post("/kml/points/")
 def create_kml(data: GridData):
-    timestmp = datetime.datetime.now().strftime('%d%m%YYYY_%H%M%S')
-    filename = f'punkty_{timestmp}.kml'
-    SpiderPoints(*data).create_kml_gpx(filename=filename)
-    return FileResponse(Path(filename), filename=filename, media_type='application/octet-stream')
+    timestmp = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
+    filename = f'punkty_{timestmp}'
+
+    SpiderPoints(data.dict()['initial_point'],
+                 data.dict()['occurrence'],
+                 data.dict()['distance']
+                 ).create_kml_gpx(filename=filename)
+    return FileResponse(Path(f'{filename}.kml'), filename=f'{filename}.kml', media_type='application/octet-stream')
 
 
-@app.get("/gpx/points/")
+@app.post("/gpx/points/")
 def create_gpx(data: GridData):
-    timestmp = datetime.datetime.now().strftime('%d%m%YYYY_%H%M%S')
-    filename = f'punkty_{timestmp}.gpx'
-    SpiderPoints(*data).create_kml_gpx(filename=filename)
-    return FileResponse(Path(filename), filename=filename, media_type='application/octet-stream')
+    timestmp = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
+    filename = f'punkty_{timestmp}'
+    SpiderPoints(data.dict()['initial_point'],
+                 data.dict()['occurrence'],
+                 data.dict()['distance']
+                 ).create_kml_gpx(filename=filename)
+    return FileResponse(Path(f'{filename}.gpx'), filename=f'{filename}.gpx', media_type='application/octet-stream')
 
 
 if __name__ == '__main__':
