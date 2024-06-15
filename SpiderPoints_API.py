@@ -1,3 +1,4 @@
+""" This module sets up an API POST endpoint """
 import datetime
 import os
 from pathlib import Path
@@ -11,12 +12,14 @@ app = FastAPI()
 
 
 class GridData(BaseModel):
+    """ Data validator """
     initial_point: str
     occurrence: str
     distance: str
 
 
 def clear_dir() -> None:
+    """ Search for any older files KML and GPX in current directory and deletes them """
     for _, _, files in os.walk(os.getcwd()):
         for f in files:
             if f.endswith('.kml') or f.endswith('.gpx'):
@@ -24,7 +27,8 @@ def clear_dir() -> None:
 
 
 @app.post("/points/")
-def create_gpx(data: GridData):
+def create_gpx(data: GridData) -> FileResponse:
+    """ Endpoint creates files using Spiderpoints package and sends them back as a FileResponse"""
     clear_dir()
 
     timestmp = datetime.datetime.now().strftime('%d%m%Y_%H%M%S')
